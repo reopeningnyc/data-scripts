@@ -12,3 +12,6 @@ sodapy = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+get_data="python src/main.py"

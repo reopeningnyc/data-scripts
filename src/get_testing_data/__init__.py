@@ -12,11 +12,13 @@ def get_testing_data():
     client = Socrata('health.data.ny.gov', os.environ.get("SOCRATA_APP_TOKEN"))
 
     # fetch results
+    print('Fetching testing data...')
     res_ny_county = client.get(dataset_identifier, county="New York")
     res_kings_county = client.get(dataset_identifier, county="Kings")
     res_queens_county = client.get(dataset_identifier, county="Queens")
     res_bronx_county = client.get(dataset_identifier, county="Bronx")
     res_richmond_county = client.get(dataset_identifier, county="Richmond")
+    print('Data fetch complete.')
 
     # combine results
     results = [
@@ -45,9 +47,10 @@ def get_testing_data():
     app = firebase_admin.initialize_app(cred)
 
     # do database transaction for covid tests
+    print('Uploading tests...')
     ref_tests_conducted = reference('/tests-conducted', app=app, url="https://reopeningnyc.firebaseio.com")
     ref_tests_conducted.set(tests)
-    print("Tests uploaded...")
+    print("Tests uploaded!")
 
     firebase_admin.delete_app(app)
 

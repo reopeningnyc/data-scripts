@@ -9,6 +9,8 @@ verify_ssl = true
 firebase-admin = "*"
 pandas = "*"
 sodapy = "*"
+selenium = "*"
+jsonnet = "*"
 
 [requires]
 python_version = "3.8"

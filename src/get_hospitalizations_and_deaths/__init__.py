@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # DATA FROM: https://www1.nyc.gov/site/doh/covid/covid-19-data.page#download
 from datetime import datetime
 import firebase_admin

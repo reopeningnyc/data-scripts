@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # DATA FROM: https://dev.socrata.com/foundry/health.data.ny.gov/xdss-u53e
 import firebase_admin
 from firebase_admin import credentials

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # DATA FROM: https://forward.ny.gov/regional-monitoring-dashboard
 from datetime import datetime
 import firebase_admin

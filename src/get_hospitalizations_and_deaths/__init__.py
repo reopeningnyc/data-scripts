@@ -15,7 +15,7 @@ from urllib.parse import unquote
 def get_data():
     # start driver and navigate to page
     print('Fetching hospitalization and deaths data...')
-    driver = webdriver.Firefox(executable_path=os.path.join(os.path.dirname(__file__), './geckodriver'))
+    driver = webdriver.Firefox(executable_path=os.path.join(os.path.dirname(__file__), '../geckodriver'))
     driver.get('https://datawrapper.dwcdn.net/4SfjZ/')
     print('Data fetch complete.')
 
@@ -68,18 +68,18 @@ def get_hospitalizations_and_deaths():
     # do database transaction for hospitalizations
     print("Uploading hospitalizations...")
     ref_hospitalizations = reference('/hospitalizations', app=app, url=database_url)
-    ref_hospitalizations.set(hospitalizations)
+    ref_hospitalizations.update(hospitalizations)
     print("Hospitalizations uploaded!")
 
     # do database transaction for deaths
     print('Uploading deaths...')
     ref_deaths = reference('/deaths', app=app, url=database_url)
-    ref_deaths.set(deaths)
+    ref_deaths.update(deaths)
     print("Deaths uploaded!")
 
     firebase_admin.delete_app(app)
 
-    print("Done!")
+    print("--> Done!")
     
 
 if __name__ == "__main__":

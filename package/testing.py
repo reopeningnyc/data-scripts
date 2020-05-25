@@ -58,7 +58,7 @@ def update_data():
 
     firebase_admin.delete_app(app)
 
-    print("--> Done!")
+    print("--> Done!\n")
 
 
 if __name__ == "__main__":

@@ -13,16 +13,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import unquote
 
 from .firebase import firebase_init
-from .geckodriver import get_geckodriver_path
+from .webdriver import get_driver
 
 
-def get_data():
-    # get webdriver path
-    webdriver_path = get_geckodriver_path()
-
+def get_data(remote):
     # start driver and navigate to page
     print('Fetching hospitalization and deaths data...')
-    driver = webdriver.Firefox(executable_path=webdriver_path)
+    driver = get_driver(remote)
     driver.get('https://datawrapper.dwcdn.net/4SfjZ/')
     print('Data fetch complete.')
 
@@ -46,9 +43,9 @@ def get_data():
         driver.quit()
 
 
-def update_data():
+def update_data(remote=False):
     # get data
-    df = get_data()
+    df = get_data(remote)
 
     # rearrange df such that the first row is headers
     new_header = df.iloc[0]  # grab the first row for the header
@@ -65,7 +62,7 @@ def update_data():
     df2 = df.set_index("DATE_OF_INTEREST").fillna(0)
 
     # get data in dict format
-    hospitalizations = df2.Hospitalizations.to_dict()
+    new_hospitalizations = df2.Hospitalizations.to_dict()
     deaths = df2.Deaths.to_dict()
 
     # initialize firebase admin
@@ -73,9 +70,9 @@ def update_data():
 
     # do database transaction for hospitalizations
     print("Uploading hospitalizations...")
-    ref_hospitalizations = reference(
-        '/hospitalizations', app=app, url=database_url)
-    ref_hospitalizations.update(hospitalizations)
+    ref_new_hospitalizations = reference(
+        '/new-hospitalizations', app=app, url=database_url)
+    ref_new_hospitalizations.update(new_hospitalizations)
     print("Hospitalizations uploaded!")
 
     # do database transaction for deaths
@@ -86,7 +83,7 @@ def update_data():
 
     firebase_admin.delete_app(app)
 
-    print("--> Done!")
+    print("--> Done!\n")
 
 
 if __name__ == "__main__":

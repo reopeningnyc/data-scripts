@@ -13,18 +13,15 @@ import re
 from selenium import webdriver
 
 from .firebase import firebase_init
-from .geckodriver import get_geckodriver_path
+from .webdriver import get_driver
 
 pattern = re.compile("Report of (.*)")
 
 
-def get_data():
-    # get webdriver path
-    webdriver_path = get_geckodriver_path()
-
+def get_data(remote):
     # start driver and navigate to page
     print('Fetching regional dashboard data...')
-    driver = webdriver.Firefox(executable_path=webdriver_path)
+    driver = get_driver(remote)
     driver.get('https://forward.ny.gov/regional-monitoring-dashboard')
     print('Data fetch complete.')
 
@@ -70,15 +67,15 @@ def get_data():
     return date_parsed, perc_values[0], perc_values[1]
 
 
-def update_data():
-    date_parsed, total_beds, icu_beds = get_data()
+def update_data(remote=False):
+    date_parsed, total_beds, icu_beds = get_data(remote)
 
     # get date string that fits db style
     date_str = date_parsed.strftime('%Y-%m-%d')
 
     # initialize firebase admin
     app, database_url = firebase_init()
-    
+
     # do database transaction for total_beds
     print("Uploading percentage of total beds available...")
     ref_hospitalizations = reference(
@@ -93,7 +90,9 @@ def update_data():
     ref_hospitalizations.set(icu_beds)
     print("Percentage of ICU beds available uploaded!")
 
-    print("--> Done!")
+    firebase_admin.delete_app(app)
+
+    print("--> Done!\n")
 
 
 if __name__ == "__main__":

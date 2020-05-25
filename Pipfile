@@ -19,3 +19,4 @@ python_version = "3.8"
 
 [scripts]
 get_data="python main.py"
+get_data_docker="python main.docker.py"

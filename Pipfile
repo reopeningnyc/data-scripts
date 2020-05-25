@@ -10,9 +10,7 @@ firebase-admin = "*"
 pandas = "*"
 sodapy = "*"
 selenium = "*"
-jsonnet = "*"
 pytesseract = "*"
-pil = "*"
 
 [requires]
 python_version = "3.8"

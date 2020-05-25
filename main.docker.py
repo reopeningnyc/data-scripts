@@ -5,12 +5,12 @@ from time import sleep
 
 def run():
     hospitalizations_and_deaths.update_data(True)
-    regional_dashboard_data.update_data(True)
+    # regional_dashboard_data.update_data(True)
     testing.update_data()
 
 
 if __name__ == "__main__":
     print("Starting data fetch...\n")
-    try_fetch.wait(5, 0, 5, 1)
-    # run()
+    try_fetch.wait(10, 10, 1, 2)
+    run()
     print("Data fetch complete!")

@@ -16,7 +16,7 @@ def wait(tries, initial_delay, delay, backoff):
 
     for n in range(tries):
         try:
-            resp = get('http://localhost:4444/wd/hub/status')
+            resp = get('http://firefox:4444/wd/hub/status')
             ready = resp.json()['value']['ready']
 
             if ready:

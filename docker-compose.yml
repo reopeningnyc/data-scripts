@@ -13,4 +13,6 @@ services:
       - firefox
     volumes: 
       - .:/script
+    links: 
+      - 'firefox:firefox'
     command: ["pipenv", "run", "get_data_docker"]

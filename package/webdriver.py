@@ -26,7 +26,7 @@ def get_geckodriver_path() -> str:
 
 def get_driver(remote=False):
     if remote:
-        return webdriver.Remote(command_executor='http://localhost:4444/wd/hub',
+        return webdriver.Remote(command_executor='http://firefox:4444/wd/hub',
                                 desired_capabilities=DesiredCapabilities.FIREFOX)
 
     # get webdriver path

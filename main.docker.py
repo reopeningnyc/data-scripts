@@ -5,7 +5,7 @@ from time import sleep
 
 def run():
     hospitalizations_and_deaths.update_data(True)
-    # regional_dashboard_data.update_data(True)
+    regional_dashboard_data.update_data(True)
     testing.update_data()
 
 

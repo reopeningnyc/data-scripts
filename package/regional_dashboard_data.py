@@ -49,8 +49,9 @@ def get_data(remote):
     print("Processing complete.")
 
     # grab date string
+    date_prefix = "Report as of"
     date_str = [t for t in text.split(
-        '\n') if "Report of" in t].pop().split("Report of ").pop()
+        '\n') if date_prefix in t].pop().split("%s " % date_prefix).pop()
 
     # parse date string
     date_parsed = datetime.strptime(date_str, '%b %d, %Y')

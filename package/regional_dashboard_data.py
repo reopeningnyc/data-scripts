@@ -15,7 +15,7 @@ from selenium import webdriver
 from .firebase import firebase_init
 from .webdriver import get_driver
 
-pattern = re.compile("Report of (.*)")
+pattern = r"Report.*of (.*)"
 
 
 def get_data(remote):
@@ -49,9 +49,8 @@ def get_data(remote):
     print("Processing complete.")
 
     # grab date string
-    date_prefix = "Report as of"
-    date_str = [t for t in text.split(
-        '\n') if date_prefix in t].pop().split("%s " % date_prefix).pop()
+    date_str_raw = [t for t in text.split('\n') if 'Report' in t].pop()
+    date_str = re.search(pattern, date_str_raw).group(1)
 
     # parse date string
     date_parsed = datetime.strptime(date_str, '%b %d, %Y')

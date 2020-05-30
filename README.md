@@ -1,3 +1,3 @@
 # Reopening NYC: data-scripts
 
-![.github/workflows/cron_get_data.yml](https://github.com/reopeningnyc/data-scripts/workflows/.github/workflows/cron_get_data.yml/badge.svg?branch=master)
+[![Build status](https://badge.buildkite.com/b07a58c3569327512de8ac292929bf60a4579d738e17b963d7.svg)](https://buildkite.com/reopening-nyc/data-scripts-cron-job)

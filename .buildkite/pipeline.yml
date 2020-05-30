@@ -1,0 +1,4 @@
+steps:
+  - plugins:
+      - docker-compose#v3.2.0:
+          run: script

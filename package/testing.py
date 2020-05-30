@@ -52,7 +52,10 @@ def update_data():
     # do database transaction for covid tests
     print('Uploading tests...')
     ref_tests_conducted = reference(
-        '/tests-conducted', app=app, url="https://reopeningnyc.firebaseio.com")
+        '/tests-conducted',
+        app=app,
+        url=database_url
+    )
     ref_tests_conducted.update(tests)
     print("Tests uploaded!")
 

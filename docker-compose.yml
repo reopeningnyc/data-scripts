@@ -11,8 +11,15 @@ services:
     build: .
     depends_on:
       - firefox
-    volumes: 
+    volumes:
       - .:/script
-    links: 
-      - 'firefox:firefox'
+    links:
+      - "firefox:firefox"
     command: ["pipenv", "run", "get_data_docker"]
+    environment: 
+      - SOCRATA_APP_TOKEN
+      - PRIVATE_KEY_ID
+      - PRIVATE_KEY
+      - CLIENT_EMAIL
+      - CLIENT_ID
+      - CLIENT_X509_CERT_URL

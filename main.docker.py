@@ -4,9 +4,9 @@ from time import sleep
 
 
 def run():
-    hospitalizations_and_deaths.update_data(True)
-    regional_dashboard_data.update_data(True)
+    hospitalizations_and_deaths.update_data()
     testing.update_data()
+    # regional_dashboard_data.update_data(True)
 
 
 if __name__ == "__main__":

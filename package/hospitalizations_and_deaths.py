@@ -1,56 +1,27 @@
 #!/usr/bin/env python3
-# DATA FROM: https://www1.nyc.gov/site/doh/covid/covid-19-data.page#download
+# DATA FROM: https://github.com/nychealth/coronavirus-data/blob/master/case-hosp-death.csv
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin.db import reference
-import os
 import pandas as pd
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from urllib.parse import unquote
 
 from .firebase import firebase_init
-from .webdriver import get_driver
 
 
-def get_data(remote):
-    # start driver and navigate to page
+def get_data():
     print('Fetching hospitalization and deaths data...')
-    driver = get_driver(remote)
-    driver.get('https://datawrapper.dwcdn.net/4SfjZ/')
+    df = pd.read_csv(
+        "https://raw.githubusercontent.com/nychealth/coronavirus-data/master/case-hosp-death.csv"
+    )
     print('Data fetch complete.')
 
-    try:
-        # find element
-        element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'dw-data-link')))
-
-        # get data attribute
-        data_str = element.get_attribute('href').split('utf-8,').pop()
-
-        # decode data
-        decoded = unquote(data_str)
-
-        # create dataframe
-        df = pd.DataFrame([x.split(',') for x in decoded.split('\n')])
-
-        return df
-
-    finally:
-        driver.quit()
+    return df
 
 
-def update_data(remote=False):
+def update_data():
     # get data
-    df = get_data(remote)
-
-    # rearrange df such that the first row is headers
-    new_header = df.iloc[0]  # grab the first row for the header
-    df = df[1:]  # take the data less the header row
-    df.columns = new_header  # set the header row as the df header
+    df = get_data()
 
     # set all numeric values as such
     df = df.apply(pd.to_numeric, errors='ignore')
@@ -62,8 +33,8 @@ def update_data(remote=False):
     df2 = df.set_index("DATE_OF_INTEREST").fillna(0)
 
     # get data in dict format
-    new_hospitalizations = df2.Hospitalizations.to_dict()
-    deaths = df2.Deaths.to_dict()
+    new_hospitalizations = df2.HOSPITALIZED_COUNT.to_dict()
+    deaths = df2.DEATH_COUNT.to_dict()
 
     # initialize firebase admin
     app, database_url = firebase_init()

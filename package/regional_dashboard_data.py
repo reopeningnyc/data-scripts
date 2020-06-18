@@ -1,94 +1,90 @@
 #!/usr/bin/env python3
-# DATA FROM: https://forward.ny.gov/regional-monitoring-dashboard
-from datetime import datetime
+# DATA FROM: https://forward.ny.gov/covid-19-regional-metrics-dashboard
 import firebase_admin
-from firebase_admin import credentials
 from firebase_admin.db import reference
-import io
-from PIL import Image
 import os
-import pytesseract
-import requests
+import pandas as pd
 import re
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from time import sleep
 
 from .firebase import firebase_init
 from .webdriver import get_driver
 
-pattern = r"Report.*of (.*)"
 
-
-def get_data(remote):
+def get_data(data_set, remote):
     # start driver and navigate to page
-    print('Fetching regional dashboard data...')
-    driver = get_driver(remote)
-    driver.get('https://forward.ny.gov/regional-monitoring-dashboard')
-    print('Data fetch complete.')
+    print('Opening regional dashboard page...')
+    driver = get_driver(True, remote)
+    driver.get('https://forward.ny.gov/covid-19-regional-metrics-dashboard')
+    print('Page opened.')
 
-    # get image element containing dashboard data
-    element = driver.find_element_by_xpath(
-        '//img[@alt="Regional Monitoring Dashboard"]')
+    # ensure that the page is loaded
+    sleep(10)
 
-    # get image source
-    image_src = element.get_attribute('src')
+    # get javascript file
+    js_loc = os.path.join(
+        os.getcwd(),
+        os.path.dirname(__file__),
+        "regional_dashboard_scraper.js"
+    )
 
-    # quit selenium driver
+    # results object
+    res = None
+
+    # open javascript file and run it in console to grab hospital beds
+    with open(js_loc, "r") as f:
+        try:
+            res = driver.execute_async_script(f.read(), data_set)
+        except TimeoutException:
+            print("Encountered timeout exception!")
+
+    # turn off webdriver
     driver.quit()
 
-    # get actual image data
-    print("Fetching image...")
-    response = requests.get(image_src)
-    print("Image fetch complete.")
+    # process data
+    processedData = []
+    for day in res:
+        city = day[0]['value']
+        date = day[1]['value'].split(" ")[0]
+        value = day[2]['value']
 
-    # open image with PIL
-    print("Processing image...")
-    img = Image.open(io.BytesIO(response.content))
+        if city != "New York City":
+            break
 
-    # use tesseract to convert image to string
-    text = pytesseract.image_to_string(img)
-    print("Processing complete.")
+        processedData.append([date, value])
 
-    # grab date string
-    date_str_raw = [t for t in text.split('\n') if 'Report' in t].pop()
-    date_str = re.search(pattern, date_str_raw).group(1)
+    # if nothing in the processed data, then throw
+    if len(processedData) == 0:
+        raise ValueError("No data available")
 
-    # parse date string
-    date_parsed = datetime.strptime(date_str, '%b %d, %Y')
+    # turn data into a dataframe
+    df = pd.DataFrame(processedData)
+    df.columns = ["DATE", "VALUE"]
+    df = df.apply(pd.to_numeric, errors='ignore')
+    df["VALUE"] = df["VALUE"].apply(lambda x: x * 100)
 
-    # use grab nyc data from string
-    nyc_data = text.split('\n')[-4]
+    # set index
+    df = df.set_index("DATE")
 
-    # split nyc data into data points in a list
-    data_points = nyc_data.split(' ')
-
-    # get only values with percentages
-    perc_values = [int(d.split('%')[0]) for d in data_points if '%' in d]
-
-    return date_parsed, perc_values[0], perc_values[1]
+    return df
 
 
-def update_data(remote=False):
-    date_parsed, total_beds, icu_beds = get_data(remote)
+def update_data(db_ref, data_set, remote=False):
+    data = get_data(data_set, remote)
 
-    # get date string that fits db style
-    date_str = date_parsed.strftime('%Y-%m-%d')
+    # transform data to dict
+    data_dict = data.VALUE.to_dict()
 
     # initialize firebase admin
     app, database_url = firebase_init()
 
-    # do database transaction for total_beds
-    print("Uploading percentage of total beds available...")
-    ref_hospitalizations = reference(
-        '/hospital-bed-vacancies/%s' % date_str, app=app, url=database_url)
-    ref_hospitalizations.set(total_beds)
-    print("Percentage of total beds available uploaded!")
-
-    # do database transaction for icu_beds
-    print("Uploading percentage of ICU beds available...")
-    ref_hospitalizations = reference(
-        '/icu-bed-availability/%s' % date_str, app=app, url=database_url)
-    ref_hospitalizations.set(icu_beds)
-    print("Percentage of ICU beds available uploaded!")
+    # do database transaction for data
+    print("Uploading data for %s..." % data_set)
+    ref_data = reference(db_ref, app=app, url=database_url)
+    ref_data.update(data_dict)
+    print("Data uploaded!")
 
     firebase_admin.delete_app(app)
 

@@ -1,7 +1,7 @@
 version: "3.3"
 services:
-  firefox:
-    image: selenium/standalone-firefox
+  chrome:
+    image: selenium/standalone-chrome
     volumes:
       - /dev/shm:/dev/shm
     ports:
@@ -10,13 +10,13 @@ services:
   script:
     build: .
     depends_on:
-      - firefox
+      - chrome
     volumes:
       - .:/script
     links:
-      - "firefox:firefox"
+      - "chrome:chrome"
     command: ["pipenv", "run", "get_data_docker"]
-    environment: 
+    environment:
       - SOCRATA_APP_TOKEN
       - PRIVATE_KEY_ID
       - PRIVATE_KEY

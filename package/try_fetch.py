@@ -16,7 +16,7 @@ def wait(tries, initial_delay, delay, backoff):
 
     for n in range(tries):
         try:
-            resp = get('http://firefox:4444/wd/hub/status')
+            resp = get('http://chrome:4444/wd/hub/status')
             ready = resp.json()['value']['ready']
 
             if ready:
@@ -25,7 +25,7 @@ def wait(tries, initial_delay, delay, backoff):
         except ConnectionError as err:
             prRed("ERROR: %s" % err)
 
-        prYellow("Firefox not yet ready. Retrying in %s seconds...\n" % active_delay)
+        prYellow("Chrome not yet ready. Retrying in %s seconds...\n" % active_delay)
         sleep(active_delay)
         active_delay *= backoff
 

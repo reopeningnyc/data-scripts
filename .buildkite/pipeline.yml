@@ -1,5 +1,53 @@
 steps:
-  - label: "Run cron job"
+  # prepare docker container
+  - label: "Build docker container"
+    plugins:
+      - docker-compose#v3.2.0:
+          build: script
+  - wait: ~
+
+  # get data
+  - label: "Get testing data"
+    command:
+      - pipenv run get_testing_data
+    retry:
+      automatic: true
+    plugins:
+      - docker-compose#v3.2.0:
+          run: script
+
+  - label: "Get hospital bed vacancy data"
+    command:
+      - pipenv run get_hospital_bed_vacancy_data
+    retry:
+      automatic: true
+    plugins:
+      - docker-compose#v3.2.0:
+          run: script
+
+  - label: "Get ICU bed availability data"
+    command:
+      - pipenv run get_icu_bed_availability_data
+    retry:
+      automatic: true
+    plugins:
+      - docker-compose#v3.2.0:
+          run: script
+
+  - label: "Get new hospitalizations and deaths data"
+    command:
+      - pipenv run get_new_hospitalizations_and_deaths_data
+    retry:
+      automatic: true
+    plugins:
+      - docker-compose#v3.2.0:
+          run: script
+
+  - label: "Get total hospitalizations data"
+    command:
+      - pipenv run get_total_hospitalizations_data
+    retry:
+      automatic: true
     plugins:
       - docker-compose#v3.2.0:
           run: script

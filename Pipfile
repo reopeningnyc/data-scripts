@@ -16,4 +16,8 @@ python_version = "3.8"
 
 [scripts]
 get_data="python main.py"
-get_data_docker="python main.docker.py"
+get_testing_data="python testing.docker.py"
+get_hospital_bed_vacancy_data="python hospital_bed_vacancy.docker.py"
+get_icu_bed_availability_data="python icu_bed_availability.docker.py"
+get_new_hospitalizations_and_deaths_data="python new_hospitalizations_and_deaths.docker.py"
+get_total_hospitalizations_data="python total_hospitalizations.docker.py"

@@ -15,7 +15,6 @@ services:
       - .:/script
     links:
       - "chrome:chrome"
-    command: ["pipenv", "run", "get_data_docker"]
     environment:
       - SOCRATA_APP_TOKEN
       - PRIVATE_KEY_ID

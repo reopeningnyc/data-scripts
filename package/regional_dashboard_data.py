@@ -47,8 +47,8 @@ def get_data(data_set, remote):
     processedData = []
     for day in res:
         city = day[0]['value']
-        date = day[1]['value'].split(" ")[0]
-        value = day[2]['value']
+        date = day[2]['value'].split(" ")[0]
+        value = day[3]['value']
 
         if city != "New York City":
             break
@@ -67,6 +67,8 @@ def get_data(data_set, remote):
 
     # set index
     df = df.set_index("DATE")
+
+    print(df)
 
     return df
 
